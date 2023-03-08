@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from rembg import remove
-from PIL import Image
+from PIL import Image, ImageOps
 from PIL import ImageColor
 import re
 import os
@@ -40,7 +40,13 @@ def upload_file():
         output = remove(input)
         output_file_name = 'static/uploads/'+filename+'_new.png'
         output.save(output_file_name)
-        resp = jsonify({'message':'File successfully uploaded','image_url':output_file_name})
+        # Adding border of 10px around image
+        output_file_path = output_file_name
+        output_border_extended = Image.open(output_file_path)
+        output_with_border = ImageOps.expand(output_border_extended, border=10, fill='black')
+        output_extended_filename = 'static/uploads/'+filename+'_ext.png'
+        output_with_border.save(output_extended_filename)
+        resp = jsonify({'message':'File successfully uploaded','image_url':output_extended_filename})
         resp.status_code = 201
         return resp
     else:
