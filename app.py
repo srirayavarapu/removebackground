@@ -46,7 +46,7 @@ def upload_file():
         bbox = output.getbbox()
         cropped_output = output.crop(bbox)
         # Add a border of 10px around the cropped image
-        output_border_extended = ImageOps.expand(cropped_output, border=3, fill='black')
+        output_border_extended = ImageOps.expand(cropped_output, border=0, fill='white')
         output_extended_filename = 'static/uploads/'+filename+'_ext.png'
         output_border_extended.save(output_extended_filename)
         resp = jsonify({'message':'File successfully uploaded','image_url':output_extended_filename})
