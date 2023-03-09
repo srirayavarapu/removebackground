@@ -42,10 +42,13 @@ def upload_file():
         output.save(output_file_name)
         # Adding border of 10px around image
         output_file_path = output_file_name
-        output_border_extended = Image.open(output_file_path)
-        output_with_border = ImageOps.expand(output_border_extended, border=10, fill='black')
+        # Crop the image to the bounding box of the object
+        bbox = output.getbbox()
+        cropped_output = output.crop(bbox)
+        # Add a border of 10px around the cropped image
+        output_border_extended = ImageOps.expand(cropped_output, border=3, fill='black')
         output_extended_filename = 'static/uploads/'+filename+'_ext.png'
-        output_with_border.save(output_extended_filename)
+        output_border_extended.save(output_extended_filename)
         resp = jsonify({'message':'File successfully uploaded','image_url':output_extended_filename})
         resp.status_code = 201
         return resp
