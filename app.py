@@ -37,19 +37,14 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         input_file_path = app.config['UPLOAD_FOLDER']+filename
         input = Image.open(input_file_path)
-        output = remove(input)
+        # Crop the image to the bounding box of the object with a 10px margin
+        bbox = input.getbbox()
+        bbox = (bbox[0]-10, bbox[1]-10, bbox[2]+10, bbox[3]+10)
+        cropped_input = input.crop(bbox)
+        output = remove(cropped_input)
         output_file_name = 'static/uploads/'+filename+'_new.png'
         output.save(output_file_name)
-        # Adding border of 10px around image
-        output_file_path = output_file_name
-        # Crop the image to the bounding box of the object
-        bbox = output.getbbox()
-        cropped_output = output.crop(bbox)
-        # Add a border of 10px around the cropped image
-        output_border_extended = ImageOps.expand(cropped_output, border=0, fill='white')
-        output_extended_filename = 'static/uploads/'+filename+'_ext.png'
-        output_border_extended.save(output_extended_filename)
-        resp = jsonify({'message':'File successfully uploaded','image_url':output_extended_filename})
+        resp = jsonify({'message':'File successfully uploaded','image_url':output_file_name})
         resp.status_code = 201
         return resp
     else:
